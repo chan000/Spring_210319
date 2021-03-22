@@ -1,6 +1,7 @@
 package org.ict.controller;
 
 import org.ict.domain.BoardVO;
+import org.ict.domain.Criteria;
 import org.ict.service.BoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,10 +34,15 @@ public class BoardController {
 	// void 리턴을 하며, .addAttribute()를 이용해
 	// list라는 이름으로 전체 글 목록을 뷰에 전달합니다.
 	@RequestMapping("/list")
-	public void list(Model model) {
+	// Criteria를 선언하면 /board/list 주소에서
+	// page, number 파라미터로 값 전달 가능
+	public void list(Model model, Criteria cri) {
 		
 		log.info("list");
-		model.addAttribute("list", service.getList());
+		//model.addAttribute("list", service.getList());
+		model.addAttribute("list", 
+				service.getListPage(cri));
+		
 	}
 	
 	// CRUD(select, insert, delete, update)기능 연결시
@@ -122,12 +128,13 @@ public class BoardController {
 	// 이후 테스트코드로 테스트할때는 post방식을 처리할수있도록 합니다.
 	@PostMapping("/remove")
 	public String remove(Long bno, 
-				RedirectAttributes rttr) {
+				RedirectAttributes rttr, Model model) {
 		
 		service.remove(bno);
 		// 추후 삭제 완료시 XX번 글이 삭제되었습니다라는
 		// 팝업을 띄우기 위해 미리 세팅
 		rttr.addFlashAttribute("bno", bno);
+		//model.addAttribute("bno", bno);
 		
 		// 삭제된 글의 디테일페이지는 존재하지 않으므로 리스트로 이동
 		return "redirect:/board/list";

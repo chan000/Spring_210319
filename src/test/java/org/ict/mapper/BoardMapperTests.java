@@ -3,6 +3,7 @@ package org.ict.mapper;
 import java.util.List;
 
 import org.ict.domain.BoardVO;
+import org.ict.domain.Criteria;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class BoardMapperTests {
 	@Autowired
 	private BoardMapper mapper;
 	
-	@Test
+	//@Test
 	public void testGetList() {
 		List<BoardVO> boards = mapper.getList();
 		boards.forEach(board -> {
@@ -56,7 +57,7 @@ public class BoardMapperTests {
 		mapper.delete(2L);
 	}
 	
-	@Test
+	//@Test
 	public void testUpate() {
 		// 수정내역은 BoardVO에 담아서 보내야 합니다.
 		// BoardVO를 생성해주시고 필요정보(bno, title, content)
@@ -71,7 +72,17 @@ public class BoardMapperTests {
 		log.info("변경된 컬럼수 : " + count);
 	}
 	
+	@Test
+	public void testListPage() {
+		// 파라미터로 Criteria 객체를 요구하므로 생성해서 전달
+		Criteria cri = new Criteria();
+		cri.setPage(1);
+		cri.setNumber(10);
+		
+		mapper.listPage(cri).forEach(board -> {
+			log.info(board);
+		});
+	}
 	
-	
-	
+
 }

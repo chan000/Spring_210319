@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Select;
 import org.ict.domain.BoardVO;
+import org.ict.domain.Criteria;
 
 // 마이바티티스는 인터페이스 메서드를 정의한 다음
 // xml파일에 메서드 실행시 동작시킬 쿼리문을 분리해 저장합니다.
@@ -40,6 +41,9 @@ public interface BoardMapper {
 	// return자료형에 int자료형을 정의하는것을 허용합니다.
 	// 이 경우, mapper xml에서는 resultType을 명시하지 않습니다.
 	public int update(BoardVO board);
+
+	// 페이지 정보를 함께 받아 목록을 출력하는 메서드 작성
+	public List<BoardVO> listPage(Criteria cri);
 	
 }
 

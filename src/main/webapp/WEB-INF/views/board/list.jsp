@@ -4,6 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
 <meta charset="UTF-8">
 <title>Insert title here</title>
@@ -59,7 +60,35 @@
 
 
   </div><!-- div container end -->
-	
-
+  <!-- 하단에 Script태그를 이용해 ${bno}를 콘솔에 출력하는
+  구문을 작성해 list페이지의 개발자도구 console창에 출력해보세요. -->
+	<script type="text/javascript">
+		$(document).ready(function(){
+			
+			// 삭제된 글 번호는 controller에서 넘어옵니다.
+			// ${bno}라는 명칭으로 넘어오므로 변수에 저장합니다.
+			// 문자열 형태로 받아오도록 처리
+			// 그렇지 않으면 콘솔창에서 받은 자료가 없을때 에러가 남
+			var bno = "${bno}";
+			
+			// 받아 온 bno를 출력
+			console.log(bno);
+			
+			// alert()구문을 이용해 글을 삭제할때마다
+			// n번 글이 삭제되었습니다 라는 안내문구를 띄워주세요.
+			// 조건문을 이용해 삭제일때만 실행하도록 로직을 수정합니다.
+			if(bno !== ''){
+				alert(bno + "번 글이 삭제되었습니다.");
+			}
+		});
+	</script>
 </body>
 </html>
+
+
+
+
+
+
+
+
