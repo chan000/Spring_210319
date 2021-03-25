@@ -59,11 +59,10 @@ public class BoardServiceImpl implements BoardService {
 		return mapper.getList();
 	}
 
-	@Override
 	public List<BoardVO> getListPage(SearchCriteria cri) {
 		return mapper.listPage(cri);
 	}
-	@Override
+
 	public int getCountPage(SearchCriteria cri) {
 		return mapper.countPageNum(cri);
 	}

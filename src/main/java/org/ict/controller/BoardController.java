@@ -61,7 +61,7 @@ public class BoardController {
 	// 따라서 PostMapping 어노테이션을 써야합니다.
 	@PostMapping("/register")
 	public String register(BoardVO board, 
-							RedirectAttributes rttr, SearchCriteria cri) {
+							RedirectAttributes rttr,SearchCriteria cri) {
 		// 게시물 등록 후 리스트 창으로 이동하기 위해
 		// 리다이렉트 방식을 활용합니다.
 		// 리다이렉트가 된 이후에 쓸 데이터를 남기기 위해
@@ -73,8 +73,8 @@ public class BoardController {
 		service.register(board);
 		
 		rttr.addFlashAttribute("result", board.getBno());
-		rttr.addAttribute("searchType",cri.getSearchType());
-		rttr.addAttribute("keyboard",cri.getKeyword());
+		rttr.addAttribute("searchType", cri.getSearchType());
+		rttr.addAttribute("keyword", cri.getKeyword());
 		return "redirect:/board/list";
 	}
 	
@@ -95,7 +95,8 @@ public class BoardController {
 	// 지금 현재 메서드가 출력할 .jsp 파일을 생성하고,
 	// 그 파일 내부에 bno번 글을 표출해주세요.
 	@GetMapping("/get")
-	public void get(Long bno, Model model, SearchCriteria cri){
+	public void get(Long bno, Model model, 
+			SearchCriteria cri){
 		model.addAttribute("cri", cri);
 		model.addAttribute("board", service.get(bno));
 	}
@@ -106,8 +107,8 @@ public class BoardController {
 	// 수정창으로 진입하는 부분과, 수정 후 디테일 페이지로
 	// 넘어오는 로직을 추가로 작성해주세요.
 	@PostMapping("/modify")
-	public String modify(Model model, SearchCriteria cri, Long bno,
-			RedirectAttributes rttr) {
+	public String modify(Model model, 
+			SearchCriteria cri, Long bno) {
 		
 		// 계획
 		// 1. 상세 글 정보를 저장합니다.
@@ -116,8 +117,7 @@ public class BoardController {
 		model.addAttribute("board", board);
 		
 		model.addAttribute("cri", cri);
-		rttr.addAttribute("searchType",cri.getSearchType());
-		rttr.addAttribute("keyboard",cri.getKeyword());
+		
 		return "/board/modify";
 	}
 	
@@ -127,7 +127,7 @@ public class BoardController {
 	// RedirectAttributes를 선언합니다.
 	@PostMapping("/modifyrun")
 	public String modify(BoardVO board,
-			SearchCriteria cri,
+					SearchCriteria cri,
 					RedirectAttributes rttr) {
 		// 넘겨받은 글 정보를 갱신 등록
 		service.modify(board);
@@ -135,8 +135,9 @@ public class BoardController {
 		// 수정된 글 번호 정보를 저장
 		rttr.addFlashAttribute("bno",board.getBno());
 		rttr.addAttribute("page", cri.getPage());
-		rttr.addAttribute("searchType",cri.getSearchType());
-		rttr.addAttribute("keyboard",cri.getKeyword());
+		rttr.addAttribute("searchType", cri.getSearchType());
+		rttr.addAttribute("keyword", cri.getKeyword());
+		
 		// 디테일 페이지로 넘어가기 위해 redirect 주소 설정
 		return "redirect:/board/get?bno=" + board.getBno();
 	}
@@ -158,9 +159,8 @@ public class BoardController {
 		
 		// Criteria의 page 정보를 url에 붙여서 보냅니다.
 		rttr.addAttribute("page", cri.getPage());
-		
-		rttr.addAttribute("searchType",cri.getSearchType());
-		rttr.addAttribute("keyboard",cri.getKeyword());
+		rttr.addAttribute("searchType", cri.getSearchType());
+		rttr.addAttribute("keyword", cri.getKeyword());
 		// 삭제된 글의 디테일페이지는 존재하지 않으므로 리스트로 이동
 		return "redirect:/board/list";
 	}

@@ -3,32 +3,31 @@ package org.ict.service;
 import java.util.List;
 
 import org.ict.domain.ReplyVO;
-import org.ict.mapper.ReplyMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class ReplyServiceImpl implements ReplyService {
 
-	@Autowired
-	private ReplyMapper mapper;
-
 	@Override
-	public List<ReplyVO> listReply(int bno) {
-		return mapper.getList(bno);
+	public void addReply(ReplyVO vo) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
-	public void addReply(ReplyVO vo) {
-		mapper.create(vo);
+	public List<ReplyVO> listReply(int bno) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public void modifyReply(ReplyVO vo) {
-		mapper.update(vo);
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void removeReply(int rno) {
-		mapper.delete(rno);
+		// TODO Auto-generated method stub
+		
 	}
 
 }
