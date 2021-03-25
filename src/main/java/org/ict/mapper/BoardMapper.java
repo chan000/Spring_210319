@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Select;
 import org.ict.domain.BoardVO;
 import org.ict.domain.Criteria;
+import org.ict.domain.SearchCriteria;
 
 // 마이바티티스는 인터페이스 메서드를 정의한 다음
 // xml파일에 메서드 실행시 동작시킬 쿼리문을 분리해 저장합니다.
@@ -43,7 +44,11 @@ public interface BoardMapper {
 	public int update(BoardVO board);
 
 	// 페이지 정보를 함께 받아 목록을 출력하는 메서드 작성
-	public List<BoardVO> listPage(Criteria cri);
+	public List<BoardVO> listPage(SearchCriteria cri);
+
+	// 전체 글 갯수를 로딩할때마다 받아오기 위해 처리
+	public int countPageNum(SearchCriteria cri);
+	
 	
 }
 

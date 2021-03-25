@@ -14,6 +14,48 @@
   	<div class="row">
   		<h1 class="text-primary text-center">전체 글 목록</h1>
   	</div>
+  	<div class="row">
+  		<div class="text-body">
+  			<select name="searchType">
+  				<option value="n"
+  				<c:out value="${cri.searchType == null ? 'selected' : '' }" />>	
+  				-
+  				</option>
+  				<option value="t"
+  				<c:out value="${cri.searchType eq 't' ? 'selected' : '' }" />>	
+  				제목
+  				</option>
+  				<option value="c"
+  				<c:out value="${cri.searchType eq 'c' ? 'selected' : '' }" />>	
+  				본문
+  				</option>
+  				<option value="w"
+  				<c:out value="${cri.searchType eq 'w' ? 'selected' : '' }" />>	
+  				글쓴이
+  				</option>
+  				<option value="tc"
+  				<c:out value="${cri.searchType eq 'tc' ? 'selected' : '' }" />>	
+  				제목+본문
+  				</option>
+  				<option value="cw"
+  				<c:out value="${cri.searchType eq 'cw' ? 'selected' : '' }" />>	
+  				본문+글쓴이
+  				</option>
+  				<option value="tcw"
+  				<c:out value="${cri.searchType eq 'tcw' ? 'selected' : '' }" />>	
+  				제목+본문+글쓴이
+  				</option>
+  			</select>
+  			
+  			<input type="text"
+  					name="keyword"
+  					id="keywordInput"
+  					value="${cri.keyword }">
+  			<button id="searchBtn">Search</button>
+  			
+  		</div>
+  	</div>
+  	
     <div class="row">
       <table class="table table-hover">
         <thead>
@@ -33,7 +75,7 @@
           <c:forEach var="board" items="${list }">
 	          <tr>
 		          <td>${board.bno }</td>
-		          <td><a href="/board/get?bno=${board.bno}">
+		          <td><a href="/board/get?bno=${board.bno}&page=${cri.page}&searchType=${cri.searchType}&keyword=${cri.keyword}">
 		          		${board.title }</a></td>
 		          <td>${board.writer }</td>
 		          <td>${board.regDate }</td>
@@ -46,13 +88,37 @@
     </div>
     <div class="row">
 	  <ul class="col-md-11 pagination justify-content-center">
-	    <li class="page-item disabled"><a class="page-link" href="#">«</a></li>
-	    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-	    <li class="page-item"><a class="page-link" href="#">2</a></li>
-	    <li class="page-item"><a class="page-link" href="#">3</a></li>
-	    <li class="page-item"><a class="page-link" href="#">4</a></li>
-	    <li class="page-item"><a class="page-link" href="#">5</a></li>
-	    <li class="page-item"><a class="page-link" href="#">»</a></li>
+	    <!-- 이전 페이지 버튼 -->
+	    <c:if test="${pageMaker.prev }">
+	    	<li class="page-item">
+	    		<a class="page-link"
+	    			href="/board/list?page=${pageMaker.startPage -1 }&searchType=${cri.searchType}&keyword=${cri.keyword}">
+	    			&laquo;	
+	    		</a>
+	    	</li>
+	    </c:if>
+	    
+	    <!-- 페이지 번호 버튼 -->
+	    <c:forEach begin="${pageMaker.startPage }"
+	    			end="${pageMaker.endPage }"
+	    			var="idx">		
+	    	<li class="page-item
+	    		<c:out value="${pageMaker.cri.page == idx ? 'active' : '' }" />">
+	    		<a class="page-link"
+	    			href="/board/list?page=${idx }&searchType=${cri.searchType}&keyword=${cri.keyword}">${idx }</a>
+	    	</li>
+	    </c:forEach>
+	    
+	    <!-- 다음 페이지 버튼 -->
+	    <c:if test="${pageMaker.next && pageMaker.endPage >0 }">
+	    	<li class="page-item">
+	    		<a class="page-link"
+	    			href="/board/list?page=${pageMaker.endPage +1 }&searchType=${cri.searchType}&keyword=${cri.keyword}">
+	    			&raquo;	
+	    		</a>
+	    	</li>
+	    </c:if>
+	    
 	  </ul>
 	  <a class="col-md-1 btn btn-primary btn-sm" 
 	  	href="/board/register">글쓰기</a>
@@ -80,6 +146,15 @@
 			if(bno !== ''){
 				alert(bno + "번 글이 삭제되었습니다.");
 			}
+			
+			//검색버튼 작동
+			$('#searchBtn').on("click", function(event){
+				self.location = "list"
+					+ "?page=1"
+					+ "&searchType="
+					+ $("select option:selected").val()
+					+ "&keyword=" + $("#keywordInput").val();
+			});
 		});
 	</script>
 </body>

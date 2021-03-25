@@ -2,6 +2,8 @@ package org.ict.controller;
 
 import org.ict.domain.BoardVO;
 import org.ict.domain.Criteria;
+import org.ict.domain.PageMaker;
+import org.ict.domain.SearchCriteria;
 import org.ict.service.BoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -36,13 +38,21 @@ public class BoardController {
 	@RequestMapping("/list")
 	// Criteria를 선언하면 /board/list 주소에서
 	// page, number 파라미터로 값 전달 가능
-	public void list(Model model, Criteria cri) {
+	public void list(Model model, SearchCriteria cri) {
 		
 		log.info("list");
 		//model.addAttribute("list", service.getList());
 		model.addAttribute("list", 
 				service.getListPage(cri));
+		model.addAttribute("cri", cri);
 		
+		//페이지네이터를 그리기 위해 처리 정보 전달
+		PageMaker pageMaker = new PageMaker();
+		// 현재 몇 페이지를 조회중인지 알아야 설정이 되므로
+		pageMaker.setCri(cri);
+		//pageMaker.setTotalBoard(131);
+		pageMaker.setTotalBoard(service.getCountPage(cri));
+		model.addAttribute("pageMaker", pageMaker);
 	}
 	
 	// CRUD(select, insert, delete, update)기능 연결시
@@ -51,7 +61,7 @@ public class BoardController {
 	// 따라서 PostMapping 어노테이션을 써야합니다.
 	@PostMapping("/register")
 	public String register(BoardVO board, 
-							RedirectAttributes rttr) {
+							RedirectAttributes rttr, SearchCriteria cri) {
 		// 게시물 등록 후 리스트 창으로 이동하기 위해
 		// 리다이렉트 방식을 활용합니다.
 		// 리다이렉트가 된 이후에 쓸 데이터를 남기기 위해
@@ -63,7 +73,8 @@ public class BoardController {
 		service.register(board);
 		
 		rttr.addFlashAttribute("result", board.getBno());
-		
+		rttr.addAttribute("searchType",cri.getSearchType());
+		rttr.addAttribute("keyboard",cri.getKeyword());
 		return "redirect:/board/list";
 	}
 	
@@ -84,8 +95,8 @@ public class BoardController {
 	// 지금 현재 메서드가 출력할 .jsp 파일을 생성하고,
 	// 그 파일 내부에 bno번 글을 표출해주세요.
 	@GetMapping("/get")
-	public void get(Long bno, Model model){
-		
+	public void get(Long bno, Model model, SearchCriteria cri){
+		model.addAttribute("cri", cri);
 		model.addAttribute("board", service.get(bno));
 	}
 	
@@ -95,7 +106,8 @@ public class BoardController {
 	// 수정창으로 진입하는 부분과, 수정 후 디테일 페이지로
 	// 넘어오는 로직을 추가로 작성해주세요.
 	@PostMapping("/modify")
-	public String modify(Model model, Long bno) {
+	public String modify(Model model, SearchCriteria cri, Long bno,
+			RedirectAttributes rttr) {
 		
 		// 계획
 		// 1. 상세 글 정보를 저장합니다.
@@ -103,6 +115,9 @@ public class BoardController {
 		// 2. 이 정보를 view 파일로 전송합니다.
 		model.addAttribute("board", board);
 		
+		model.addAttribute("cri", cri);
+		rttr.addAttribute("searchType",cri.getSearchType());
+		rttr.addAttribute("keyboard",cri.getKeyword());
 		return "/board/modify";
 	}
 	
@@ -111,14 +126,17 @@ public class BoardController {
 	// 리다이렉트시 글번호를 같이 넘기기 위해 
 	// RedirectAttributes를 선언합니다.
 	@PostMapping("/modifyrun")
-	public String modify(BoardVO board, 
+	public String modify(BoardVO board,
+			SearchCriteria cri,
 					RedirectAttributes rttr) {
 		// 넘겨받은 글 정보를 갱신 등록
 		service.modify(board);
 		
 		// 수정된 글 번호 정보를 저장
 		rttr.addFlashAttribute("bno",board.getBno());
-		
+		rttr.addAttribute("page", cri.getPage());
+		rttr.addAttribute("searchType",cri.getSearchType());
+		rttr.addAttribute("keyboard",cri.getKeyword());
 		// 디테일 페이지로 넘어가기 위해 redirect 주소 설정
 		return "redirect:/board/get?bno=" + board.getBno();
 	}
@@ -128,7 +146,9 @@ public class BoardController {
 	// 이후 테스트코드로 테스트할때는 post방식을 처리할수있도록 합니다.
 	@PostMapping("/remove")
 	public String remove(Long bno, 
-				RedirectAttributes rttr, Model model) {
+				RedirectAttributes rttr, 
+				SearchCriteria cri,
+				Model model) {
 		
 		service.remove(bno);
 		// 추후 삭제 완료시 XX번 글이 삭제되었습니다라는
@@ -136,6 +156,11 @@ public class BoardController {
 		rttr.addFlashAttribute("bno", bno);
 		//model.addAttribute("bno", bno);
 		
+		// Criteria의 page 정보를 url에 붙여서 보냅니다.
+		rttr.addAttribute("page", cri.getPage());
+		
+		rttr.addAttribute("searchType",cri.getSearchType());
+		rttr.addAttribute("keyboard",cri.getKeyword());
 		// 삭제된 글의 디테일페이지는 존재하지 않으므로 리스트로 이동
 		return "redirect:/board/list";
 	}

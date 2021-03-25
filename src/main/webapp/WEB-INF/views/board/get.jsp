@@ -16,6 +16,9 @@
 				<input type="hidden" 
 					   name="bno" 
 					   value="${board.bno }">
+				<input type="hidden" name="searchType" value=${cri.searchType } />
+				<input type="hidden" name="keyword" value=${cri.keyword } />					   
+				<input type="hidden" name="page" value="${cri.page }">
 				<div class="col-md-5">
 				글쓴이<input type="text" class="form-control"
 					readonly=true value="${board.writer }"><br>
@@ -49,7 +52,7 @@
 					<button type="submit"
 							data-oper="remove"
 							class="btn btn-danger">삭제</button>
-					<a href="/board/list"
+					<a href="/board/list?page=${cri.page }&searchType=${cri.searchType}&keyword=${cri.keyword}"
 					   class="btn btn-primary">목록</a>
 			</form>
 

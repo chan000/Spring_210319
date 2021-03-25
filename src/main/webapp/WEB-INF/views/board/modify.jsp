@@ -26,6 +26,9 @@
 		수정날짜<input name="updateDate" type="text" class="form-control"
 			readonly=true value=${board.updateDate }><br>
 		<input type="hidden" name="bno" value=${board.bno } />
+		<input type="hidden" name="page" value=${cri.page } />
+		<input type="hidden" name="searchType" value=${cri.searchType } />
+		<input type="hidden" name="keyword" value=${cri.keyword } />
 		<input type="submit" value="제출" class="btn btn-primary">
 	</form>
 
