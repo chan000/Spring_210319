@@ -10,13 +10,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class ReplyServiceImpl implements ReplyService {
 
-
 	@Autowired
 	private ReplyMapper mapper;
 	
 	@Override
 	public void addReply(ReplyVO vo) {
-		
 		mapper.create(vo);
 	}
 

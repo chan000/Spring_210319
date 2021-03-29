@@ -1,6 +1,7 @@
 package org.ict.controller;
 
 import org.ict.domain.BoardVO;
+import org.ict.domain.Criteria;
 import org.ict.domain.PageMaker;
 import org.ict.domain.SearchCriteria;
 import org.ict.service.BoardService;
@@ -59,8 +60,9 @@ public class BoardController {
 	// Post방식을 적용합니다.
 	// 따라서 PostMapping 어노테이션을 써야합니다.
 	@PostMapping("/register")
-	public String register(BoardVO board, 
-							RedirectAttributes rttr,SearchCriteria cri) {
+	public String register(BoardVO board,
+							SearchCriteria cri,
+							RedirectAttributes rttr) {
 		// 게시물 등록 후 리스트 창으로 이동하기 위해
 		// 리다이렉트 방식을 활용합니다.
 		// 리다이렉트가 된 이후에 쓸 데이터를 남기기 위해
