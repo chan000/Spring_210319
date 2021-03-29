@@ -34,7 +34,7 @@ public class ReplyController {
 		ResponseEntity<String> entity = null;
 		try {
 			service.addReply(vo);
-			entity = new ResponseEntity<String>("SUCCES", HttpStatus.OK);
+			entity = new ResponseEntity<String>("SUCCESS", HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			entity = new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -71,7 +71,7 @@ public class ReplyController {
 		ResponseEntity<String> entity = null;
 		try {
 			service.removeReply(rno);
-			entity = new ResponseEntity<String>("SUCCES", HttpStatus.OK);
+			entity = new ResponseEntity<String>("SUCCESS", HttpStatus.OK);
 		} catch (Exception e) {
 			entity = new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}

@@ -3,7 +3,6 @@ package org.ict.service;
 import java.util.List;
 
 import org.ict.domain.BoardVO;
-import org.ict.domain.Criteria;
 import org.ict.domain.SearchCriteria;
 
 // 서비스 계층에는 일반적으로 담당테이블 하나당 인터페이스 하나
