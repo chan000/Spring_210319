@@ -140,7 +140,7 @@
 		//삭제버튼 이벤트 처리
 		$("#replyDelBtn").on("click", function(){
 			var rno = $(".modal-title").html();
-			
+			var replytext = $("#replytext").val();
 			$.ajax({
 				type : 'delete',
 				url : '/replies/' + rno,
