@@ -5,13 +5,11 @@
 <head>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<meta charset="UTF-8">
-<title>Insert title here</title>
 <style>
 	#modDiv {
 		width: 300px;
 		height: 100px;
-		background-color: silver;
+		background-color: yellow;
 		position: absolute;
 		top: 50%;
 		left: 50%;
@@ -21,19 +19,10 @@
 		z-index: 1000;
 	}
 </style>
+<meta charset="UTF-8">
+<title>Insert title here</title>
 </head>
 <body>
-<div id="modDiv" style="display:none;">
-		<div class="modal-title"></div>
-		<div>
-			<input type="text" id="replytext">
-		</div>
-		<div>
-			<button type="button" id="replyModBtn">Modify</button>
-			<button type="button" id="replyDelBtn">Delete</button>
-			<button type="button" id="closeBtn">Close</button>			
-		</div>
-	</div>
 	<div class="container">
 		<div class="row">
 			<h1 class="text-primary">${board.bno }번 글 내용</h1>
@@ -73,23 +62,21 @@
 					 정보가 제공되도록 합니다.-->
 					<button type="submit" 
 							data-oper="modify"
-							class="btn btn-warning board">수정</button>
+							class="btn btn-warning useboard">수정</button>
 					<button type="submit"
 							data-oper="remove"
-							class="btn btn-danger board">삭제</button>
+							class="btn btn-danger useboard">삭제</button>
 					<a href="/board/list?page=${cri.page }&searchType=${cri.searchType}&keyword=${cri.keyword}"
 					   class="btn btn-primary">목록</a>
 			</form>
 
-		</div>
-		
+		</div><!-- row -->
 		<div class="row">
 			<h3 class="text-primary">댓글</h3>
 			<div id="replies">
 				<!-- 댓글이 들어갈 위치 -->
 			</div>
 		</div><!-- row -->
-		
 		<div class="row box-box-success">
 			<div class="box-header">
 				<h2 class="text-primary">댓글 작성</h2>
@@ -102,9 +89,22 @@
 			</div><!-- body -->
 			<div class="box-footer">
 				<button type="button" class="btn btn-success" id="replyAddBtn">Add Reply</button>
-			</div>
+			</div><!-- footer -->
 		</div><!-- row -->
 		
+		
+		<div id="modDiv" style="display:none;">
+			<div class="modal-title"></div>
+			<div>
+				<input type="text" id="replytext">
+			</div>
+			<div>
+				<button type="button" id="replyModBtn">Modify</button>
+				<button type="button" id="replyDelBtn">Delete</button>
+				<button type="button" id="closeBtn">Close</button>
+			</div>
+		</div>
+			
 	</div><!-- container -->
 	
 </body>
@@ -144,7 +144,7 @@
 			// 3. 버튼을 클릭했을때 data-oper 값 감지하기.
 			// 페이지 로딩완료가 아닌 버튼 클릭시 감지해야 하므로
 			// 버튼 클릭 이벤트부터 처리합니다.
-			$('.board').on("click", function(e){
+			$('.useboard').on("click", function(e){
 				// 버튼 클릭시 submit으로 설정되어 있어서
 				// 의도와 상관없이 바로 submit을 진행시킴
 				// 따라서 그걸 막기 위해 코드 추가
@@ -173,24 +173,25 @@
 				formObj.submit(); 
 			});
 			
+			
 			var bno = ${board.bno};
 			
 			function getAllList(){
 				$.getJSON("/replies/all/" + bno, function(data){
 					
 					console.log(data.length);
-				
+					
 					var str = "";
-	
+					
 					$(data).each(function() {
 						var timestamp = this.updatedate;
 						var date = new Date(timestamp);
-						
-						var formattedTime = "게시일 : " + date.getFullYear()
-											+ "/" + (date.getMonth() + 1)
-											+ "/" + date.getDate();
-						
-						str += "<div class='replyLi' data-rno='" + this.rno + "'><strong>@"
+
+						var formattedTime = "게시일 : "+ date.getFullYear()
+											+ "/"+ (date.getMonth()+1)
+											+ "/"+ date.getDate()
+					
+						str += "<div class='replyLi' data-rno='" + this.rno + "'><strong>@"  
 							+ this.replyer + "</strong> - " + formattedTime + "<br>"
 							+ "<div class='replytext'>" + this.replytext + "</div>"
 							+ "<button type='button' class='btn btn-info'>수정/삭제</button>"
@@ -199,114 +200,111 @@
 					
 					$("#replies").html(str);
 				});
-			}// getAllList()
+			}
 			getAllList();
 			
+		
+		
+		$("#replyAddBtn").on("click", function() {
+			var replyer = $("#newReplyer").val();
+			var replytext = $("#newReplyText").val();
 			
-			$("#replyAddBtn").on("click", function() {
-				var replyer = $("#newReplyer").val();
-				var replytext = $("#newReplyText").val();
-				
-				$.ajax({
-					type : 'post',
-					url : '/replies',
-					headers : {
-						"Content-Type" : "application/json",
-						"X-HTTP-Method-Override" : "POST"
-					},
-				    dataType : 'text',
-				    data : JSON.stringify({
-				    	bno : bno,
-				    	replyer: replyer,
-				    	replytext : replytext
-				    }),
-				    success : function(result) {
-				    	if(result == 'SUCCESS'){
-				    		alert("등록 되었습니다.");
-				    		// 등록 성공 후 input태그 내부를 비움
-				    		$("#newReplyer").val("");
-				    		$("#newReplyText").val("");
-							getAllList();
-				    	}
-				    }
-				});
+			$.ajax({
+				type : 'post',
+				url : '/replies',
+				headers : {
+					"Content-Type" : "application/json",
+					"X-HTTP-Method-Override" : "POST"
+				},
+			    dataType : 'text',
+			    data : JSON.stringify({
+			    	bno : bno,
+			    	replyer: replyer,
+			    	replytext : replytext
+			    }),
+			    success : function(result) {
+			    	if(result == 'SUCCESS'){
+			    		alert("등록 되었습니다.");
+			    		$("#newReplyer").val("");
+			    		$("#newReplyText").val("");
+			    		location.href="/board/get?bno=" + bno
+			    					+"&page=" + "${cri.page }"
+			    					+"&searchType=" + "${cri.searchType}"
+			    					+"&keyword=" + "${cri.keyword}";
+			    	}
+			    }
 			});
+		});
+		
+		//이벤트 위임
+		$("#replies").on("click", ".replyLi button", function(){
+			var reply = $(this).parent();
+			var rno = reply.data("rno");
+			var replytext = reply.children('.replytext').html();
 			
-			$("#addReplyList").on("click", function(){
-				getAllList();
-			})
-
-			//이벤트 위임
-			//위임은 여러 요소를 독립적으로 기능시키면서도 하나의 이벤트로 처리할때
-			//사용하는 개념으로 아래와 같이 "button"이 클릭의 대상일때
-			//버튼을 모두 포함하고 있는 가장 가까운 부모쪽 태그를 onclick의 타겟으로
-			//잡고 대신 2번째 파라미터에 최종 버튼과 그 사이의 요소를 기술합니다.
-			$("#replies").on("click", ".replyLi button", function(){
-				//"클릭한 버튼"의 부모요소만 특정지어 가져옴
-				var reply = $(this).parent();
-				
-				//.attr()는 파라미터를 하나 받은 경우 해당 속성의 값을 가져옴
-				var rno = reply.attr("data-rno");
-				//.text()는 해당 태그의 <와 >사이의 모든 자료를 삭제하고
-				//남는 요소만 가져옴
-				var replytext = reply.text();
-				
-				$(".modal-title").html(rno);
-				$("#replytext").val(replytext);
-				$("#modDiv").show("slow");
-			});
+			$(".modal-title").html(rno);
+			$("#replytext").val(replytext);
+			$("#modDiv").show("slow");
+		});
+		
+		//삭제버튼 작동
+		$("#replyDelBtn").on("click", function(){
+			var rno = $(".modal-title").html();
+			var replytext = $("#replytext").val();
 			
-			//삭제버튼 이벤트 처리
-			$("#replyDelBtn").on("click", function(){
-				var rno = $(".modal-title").html();
-				var replytext = $("#replytext").val();
-				$.ajax({
-					type : 'delete',
-					url : '/replies/' + rno,
-					success : function(result){
-						console.log("result : " + result);
-						if(result === 'SUCCESS'){
-							alert("삭제 되었습니다.");
-							$("#modDiv").hide("slow");
-							getAllList();
-						}
+			$.ajax({
+				type : 'delete',
+				url : '/replies/' + rno,
+				header : {
+					"Content-Type" : "application/json",
+					"X-HTTP-Method-Override" : "DELETE"
+				},
+				dataType : 'text',
+				success : function(result) {
+					console.log("result:  " + result);
+					if(result == 'SUCCESS') {
+						alert("삭제 되었습니다.");
+						$("#modDiv").hide("slow");
+						getAllList();
 					}
-				});
+				}
 			});
-
-			//수정버튼 이벤트 처리
-			$("#replyModBtn").on("click", function(){
-				var rno = $(".modal-title").html();
-				var replytext = $("#replytext").val();
-				
-				$.ajax({
-					type : 'put',
-					url : '/replies/' + rno,
-					header : {
-						"Content-Type" : "application/json",
-						"X-HTTP-Method-Override" : "PUT"
-					},
-					contentType : "application/json",
-					data : JSON.stringify({replytext:replytext}),
-					dataType : 'text',
-					success : function(result){
-						console.log("result : " + result);
-						if(result === 'SUCCESS'){
-							alert("수정 되었습니다.");
-							$("#modDiv").hide("slow");
-							getAllList();
-						}
+		});		
+		
+		//수정버튼 작동
+		$("#replyModBtn").on("click", function(){
+			var rno = $(".modal-title").html();
+			var replytext = $("#replytext").val();
+			
+			$.ajax({
+				type : 'patch',
+				url : '/replies/' + rno,
+				header : {
+					"Content-Type" : "application/json",
+					"X-HTTP-Method-Override" : "PATCH"
+				},
+				contentType: "application/json",
+				data: JSON.stringify({replytext:replytext}),
+				dataType : 'text',
+				success : function(result) {
+					console.log("result:  " + result);
+					if(result == 'SUCCESS') {
+						alert("수정 되었습니다.");
+						$("#modDiv").hide("slow");
+						getAllList();
 					}
-				});
+				}
 			});
-			
-			//모달창 닫기
-			$("#closeBtn").on("click", function(){
-				$("#modDiv").hide("slow");
-			});
-			
-		});//document
-	
+		});		
+		
+		//모달 닫기
+		$("#closeBtn").on("click", function() {
+			$("#modDiv").hide("slow");
+		});
+		
+		
+
+	});// $document
 	</script>
 </html>
 

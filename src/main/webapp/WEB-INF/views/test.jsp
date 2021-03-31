@@ -17,6 +17,7 @@
 		z-index: 1000;
 	}
 </style>
+
 <meta charset="UTF-8">
 <title>Insert title here</title>
 </head>
@@ -37,8 +38,7 @@
 	
 	</ul>
 	<button id="addReplyList">리플 표출</button>
-
-	<!-- 모달창 위치 -->
+	
 	<div id="modDiv" style="display:none;">
 		<div class="modal-title"></div>
 		<div>
@@ -47,7 +47,7 @@
 		<div>
 			<button type="button" id="replyModBtn">Modify</button>
 			<button type="button" id="replyDelBtn">Delete</button>
-			<button type="button" id="closeBtn">Close</button>			
+			<button type="button" id="closeBtn">Close</button>
 		</div>
 	</div>
 	
@@ -55,7 +55,7 @@
 	<!-- jquery CDN 입력 -->	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 	<script type="text/javascript">
-		var bno = 3;
+		var bno = 1;
 		
 		function getAllList(){
 			$.getJSON("/replies/all/" + bno, function(data){
@@ -106,7 +106,7 @@
 			    success : function(result) {
 			    	if(result == 'SUCCESS'){
 			    		alert("등록 되었습니다.");
-						getAllList();
+			    		getAllList();
 			    	}
 			    }
 			});
@@ -116,20 +116,12 @@
 		$("#addReplyList").on("click", function(){
 			getAllList();
 		})
-
+		
 		//이벤트 위임
-		//위임은 여러 요소를 독립적으로 기능시키면서도 하나의 이벤트로 처리할때
-		//사용하는 개념으로 아래와 같이 "button"이 클릭의 대상일때
-		//버튼을 모두 포함하고 있는 가장 가까운 부모쪽 태그를 onclick의 타겟으로
-		//잡고 대신 2번째 파라미터에 최종 버튼과 그 사이의 요소를 기술합니다.
 		$("#replies").on("click", ".replyLi button", function(){
-			//"클릭한 버튼"의 부모요소만 특정지어 가져옴
 			var reply = $(this).parent();
 			
-			//.attr()는 파라미터를 하나 받은 경우 해당 속성의 값을 가져옴
 			var rno = reply.attr("data-rno");
-			//.text()는 해당 태그의 <와 >사이의 모든 자료를 삭제하고
-			//남는 요소만 가져옴
 			var replytext = reply.text();
 			
 			$(".modal-title").html(rno);
@@ -137,16 +129,22 @@
 			$("#modDiv").show("slow");
 		});
 		
-		//삭제버튼 이벤트 처리
+		//삭제버튼 작동
 		$("#replyDelBtn").on("click", function(){
 			var rno = $(".modal-title").html();
 			var replytext = $("#replytext").val();
+			
 			$.ajax({
 				type : 'delete',
 				url : '/replies/' + rno,
-				success : function(result){
-					console.log("result : " + result);
-					if(result === 'SUCCESS'){
+				header : {
+					"Content-Type" : "application/json",
+					"X-HTTP-Method-Override" : "DELETE"
+				},
+				dataType : 'text',
+				success : function(result) {
+					console.log("result:  " + result);
+					if(result == 'SUCCESS') {
 						alert("삭제 되었습니다.");
 						$("#modDiv").hide("slow");
 						getAllList();
@@ -154,25 +152,24 @@
 				}
 			});
 		});
-
-		//수정버튼 이벤트 처리
+		//수정버튼 작동
 		$("#replyModBtn").on("click", function(){
 			var rno = $(".modal-title").html();
 			var replytext = $("#replytext").val();
 			
 			$.ajax({
-				type : 'put',
+				type : 'patch',
 				url : '/replies/' + rno,
 				header : {
 					"Content-Type" : "application/json",
-					"X-HTTP-Method-Override" : "PUT"
+					"X-HTTP-Method-Override" : "PATCH"
 				},
-				contentType : "application/json",
-				data : JSON.stringify({replytext:replytext}),
+				contentType: "application/json",
+				data: JSON.stringify({replytext:replytext}),
 				dataType : 'text',
-				success : function(result){
-					console.log("result : " + result);
-					if(result === 'SUCCESS'){
+				success : function(result) {
+					console.log("result:  " + result);
+					if(result == 'SUCCESS') {
 						alert("수정 되었습니다.");
 						$("#modDiv").hide("slow");
 						getAllList();
@@ -180,15 +177,6 @@
 				}
 			});
 		});
-		
-		//모달창 닫기
-		$("#closeBtn").on("click", function(){
-			$("#modDiv").hide("slow");
-		});
-		
-		
-		
-		
 		
 		</script>
 	

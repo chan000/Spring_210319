@@ -31,4 +31,17 @@
 		DELETE FROM ictreply
 		WHERE rno = #{rno}
 	</delete>	
+	
+	<select id="getBno" resultType="long">
+		SELECT bno FROM ictreply
+			WHERE rno = #{rno}
+	</select>
+	
+	<delete id="deleteAll">
+		DELETE FROM ictreply
+		where bno = #{bno}
+	</delete>
+
+	
+	
 </mapper>

@@ -3,19 +3,30 @@ package org.ict.service;
 import java.util.List;
 
 import org.ict.domain.ReplyVO;
+import org.ict.mapper.BoardMapper;
 import org.ict.mapper.ReplyMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import lombok.extern.log4j.Log4j;
 
 @Service
+@Log4j
 public class ReplyServiceImpl implements ReplyService {
 
 	@Autowired
 	private ReplyMapper mapper;
 	
+	@Autowired
+	private BoardMapper boardMapper;
+	
+	@Transactional
 	@Override
 	public void addReply(ReplyVO vo) {
 		mapper.create(vo);
+		Long bno = (long)vo.getBno();
+		boardMapper.updateReplyCount(bno, +1);
 	}
 
 	@Override
@@ -28,9 +39,12 @@ public class ReplyServiceImpl implements ReplyService {
 		mapper.update(vo);
 	}
 
+	@Transactional
 	@Override
 	public void removeReply(int rno) {
-		mapper.delete(rno);
+		Long bno = mapper.getBno(rno);
+		mapper.delete(rno);		
+		boardMapper.updateReplyCount(bno, -1);
 	}
 
 }
