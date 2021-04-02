@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -60,12 +61,14 @@
 					 가변적으로 action(목표url)속성을 바꿔주기 위해서
 					 data-oper 속성을 이용해 어떤 버튼을 눌렀는지 함께
 					 정보가 제공되도록 합니다.-->
+				<c:if test="${login.uname == board.writer }">
 					<button type="submit" 
 							data-oper="modify"
 							class="btn btn-warning useboard">수정</button>
 					<button type="submit"
 							data-oper="remove"
 							class="btn btn-danger useboard">삭제</button>
+				</c:if>
 					<a href="/board/list?page=${cri.page }&searchType=${cri.searchType}&keyword=${cri.keyword}"
 					   class="btn btn-primary">목록</a>
 			</form>
@@ -77,20 +80,29 @@
 				<!-- 댓글이 들어갈 위치 -->
 			</div>
 		</div><!-- row -->
-		<div class="row box-box-success">
-			<div class="box-header">
-				<h2 class="text-primary">댓글 작성</h2>
-			</div><!-- header -->
+		
+		<c:if test="${not empty login }">
+			<div class="row box-box-success">
+				<div class="box-header">
+					<h2 class="text-primary">댓글 작성</h2>
+				</div><!-- header -->
+				<div class="box-body">
+					<strong>Writer</strong>
+					<input type="text" value="${login.uname }" id="newReplyer" placeholder="Replyer" class="form-control" readonly>
+					<strong>ReplyText</strong>
+					<input type="text" id="newReplyText" placeholder="ReplyText" class="form-control">
+				</div><!-- body -->
+				<div class="box-footer">
+					<button type="button" class="btn btn-success" id="replyAddBtn">Add Reply</button>
+				</div><!-- footer -->
+			</div><!-- row -->
+		</c:if>
+		<c:if test="${empty login }">
 			<div class="box-body">
-				<strong>Writer</strong>
-				<input type="text" id="newReplyer" placeholder="Replyer" class="form-control">
-				<strong>ReplyText</strong>
-				<input type="text" id="newReplyText" placeholder="ReplyText" class="form-control">
-			</div><!-- body -->
-			<div class="box-footer">
-				<button type="button" class="btn btn-success" id="replyAddBtn">Add Reply</button>
-			</div><!-- footer -->
-		</div><!-- row -->
+				<div><a href="/user/login">Login Please</a></div>
+			</div>
+		</c:if>
+		
 		
 		
 		<div id="modDiv" style="display:none;">
@@ -180,6 +192,7 @@
 				$.getJSON("/replies/all/" + bno, function(data){
 					
 					console.log(data.length);
+					var loginBool = "${login.uname}";
 					
 					var str = "";
 					
@@ -191,11 +204,18 @@
 											+ "/"+ (date.getMonth()+1)
 											+ "/"+ date.getDate()
 					
-						str += "<div class='replyLi' data-rno='" + this.rno + "'><strong>@"  
+						if(this.replyer === loginBool){
+							str += "<div class='replyLi' data-rno='" + this.rno + "'><strong>@"  
+								+ this.replyer + "</strong> - " + formattedTime + "<br>"
+								+ "<div class='replytext'>" + this.replytext + "</div>"
+								+ "<button type='button' class='btn btn-info'>수정/삭제</button>"
+								+ "</div>";
+						} else {
+							str += "<div class='replyLi' data-rno='" + this.rno + "'><strong>@"  
 							+ this.replyer + "</strong> - " + formattedTime + "<br>"
 							+ "<div class='replytext'>" + this.replytext + "</div>"
-							+ "<button type='button' class='btn btn-info'>수정/삭제</button>"
 							+ "</div>";
+						}
 					});
 					
 					$("#replies").html(str);

@@ -39,9 +39,8 @@
 	
 	<delete id="deleteAll">
 		DELETE FROM ictreply
-		where bno = #{bno}
+			WHERE bno = #{bno}
 	</delete>
-
 	
 	
 </mapper>

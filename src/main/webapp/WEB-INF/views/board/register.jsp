@@ -19,7 +19,8 @@
 	<form action="/board/register" method="post">
 		제목 : <input class="form-control" type="text" name="title" /><br>
 		본문: <br><textarea class="form-control" name="content"></textarea><br>
-		글쓴이:<input class="form-control" type="text" name="writer" /><br>
+		글쓴이:<input class="form-control" type="text" name="writer" 
+					value="${login.uname }" readonly /><br>
 		<input class="btn btn-primary" type="submit" value="제출">
 	</form>
 

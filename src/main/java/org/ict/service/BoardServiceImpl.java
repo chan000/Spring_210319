@@ -53,7 +53,7 @@ public class BoardServiceImpl implements BoardService {
 	public boolean modify(BoardVO board) {
 		return mapper.update(board) == 1;
 	}
-
+	
 	@Transactional
 	@Override
 	public boolean remove(Long bno) {

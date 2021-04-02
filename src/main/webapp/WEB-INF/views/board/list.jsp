@@ -76,7 +76,7 @@
 	          <tr>
 		          <td>${board.bno }</td>
 		          <td><a href="/board/get?bno=${board.bno}&page=${cri.page}&searchType=${cri.searchType}&keyword=${cri.keyword}">
-		          		${board.title } [ <c:out value="${board.replyCount }"/> ]</a></td>
+		          		${board.title } [ ${board.replyCount } ]</a></td>
 		          <td>${board.writer }</td>
 		          <td>${board.regDate }</td>
 		          <td>${board.updateDate }</td>

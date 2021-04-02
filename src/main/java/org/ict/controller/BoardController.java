@@ -100,7 +100,6 @@ public class BoardController {
 			SearchCriteria cri){
 		model.addAttribute("cri", cri);
 		model.addAttribute("board", service.get(bno));
-		log.info("get");
 	}
 	
 	// 수정 기능을 담당하는 modify메서드를 만들어보겠습니다.

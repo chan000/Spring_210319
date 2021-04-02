@@ -1,5 +1,6 @@
 package org.ict.controller;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.ict.domain.LoginDTO;
@@ -19,35 +20,35 @@ public class UserController {
 
 	@Autowired
 	private UserService service;
-
+	
 	@GetMapping("/login")
 	public void loginGet(@ModelAttribute("dto") LoginDTO dto) {
-
+		
 	}
-
+	
 	@PostMapping("/loginPost")
-	public void loginPost(LoginDTO dto, HttpSession session, Model model) throws Exception {
-
+	public void loginPost(LoginDTO dto, HttpSession session, Model model)
+		throws Exception{
+		
 		UserVO vo = service.login(dto);
-
-		if (vo == null) {
+		
+		if(vo == null) {
 			return;
 		}
 		model.addAttribute("userVO", vo);
 	}
 	
 	@GetMapping("/joinmember")
-	public void joinGet(@ModelAttribute("dto") LoginDTO dto) {
+	public void joinMember() {
 		
+	}
+	@PostMapping("/joinmember")
+	public String joinMember(UserVO vo) {
+		service.joinMember(vo);
+		return "redirect:/board/list";
 	}
 	
-	@PostMapping("/joinmemberPost")
-	public void join(LoginDTO dto, HttpSession session, Model model) throws Exception {
-		UserVO vo = service.login(dto);
-		
-		if (vo == null) {
-			return;
-		}
-		model.addAttribute("userVO", vo);
-	}
+	
+	
 }
+

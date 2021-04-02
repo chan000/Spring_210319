@@ -11,10 +11,20 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserMapper mapper;
-
+	
 	@Override
 	public UserVO login(LoginDTO dto) throws Exception {
 		return mapper.login(dto);
+	}
+
+	@Override
+	public void joinMember(UserVO vo) {
+		mapper.joinMember(vo);
+	}
+
+	@Override
+	public UserVO getUserInfo(String uid) {
+		return mapper.getUserInfo(uid);
 	}
 
 }
