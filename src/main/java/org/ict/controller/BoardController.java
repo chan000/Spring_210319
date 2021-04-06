@@ -1,5 +1,13 @@
 package org.ict.controller;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
+
 import org.ict.domain.BoardVO;
 import org.ict.domain.Criteria;
 import org.ict.domain.PageMaker;
@@ -11,9 +19,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.extern.log4j.Log4j;
+import net.coobird.thumbnailator.Thumbnailator;
 
 // 컨트롤러는 기본적으로 테이블 단위로 생성합니다.
 // 가령 게시판 테이블 관련 컨트롤러는 아래와 같이 만들고
@@ -26,12 +36,12 @@ import lombok.extern.log4j.Log4j;
 @Log4j
 @RequestMapping("/board/*")
 public class BoardController {
-	
+
 	// 컨트롤러에서 특정 주소에 접속했을때, 서비스 메서드를
 	// 실행하기 위해서 객체 선언 및 자동주입을 해 주세요.
 	@Autowired
 	private BoardService service;
-	
+
 	// "/list" 주소를 가지는 list 메서드를 만들어주세요.
 	// void 리턴을 하며, .addAttribute()를 이용해
 	// list라는 이름으로 전체 글 목록을 뷰에 전달합니다.
@@ -39,30 +49,27 @@ public class BoardController {
 	// Criteria를 선언하면 /board/list 주소에서
 	// page, number 파라미터로 값 전달 가능
 	public void list(Model model, SearchCriteria cri) {
-		
+
 		log.info("list");
-		//model.addAttribute("list", service.getList());
-		model.addAttribute("list", 
-				service.getListPage(cri));
+		// model.addAttribute("list", service.getList());
+		model.addAttribute("list", service.getListPage(cri));
 		model.addAttribute("cri", cri);
-		
-		//페이지네이터를 그리기 위해 처리 정보 전달
+
+		// 페이지네이터를 그리기 위해 처리 정보 전달
 		PageMaker pageMaker = new PageMaker();
 		// 현재 몇 페이지를 조회중인지 알아야 설정이 되므로
 		pageMaker.setCri(cri);
-		//pageMaker.setTotalBoard(131);
+		// pageMaker.setTotalBoard(131);
 		pageMaker.setTotalBoard(service.getCountPage(cri));
 		model.addAttribute("pageMaker", pageMaker);
 	}
-	
+
 	// CRUD(select, insert, delete, update)기능 연결시
 	// SELECT를 제외한 기능에는 특별한 상황이 아니면
 	// Post방식을 적용합니다.
 	// 따라서 PostMapping 어노테이션을 써야합니다.
 	@PostMapping("/register")
-	public String register(BoardVO board,
-							SearchCriteria cri,
-							RedirectAttributes rttr) {
+	public String register(BoardVO board, SearchCriteria cri, RedirectAttributes rttr) {
 		// 게시물 등록 후 리스트 창으로 이동하기 위해
 		// 리다이렉트 방식을 활용합니다.
 		// 리다이렉트가 된 이후에 쓸 데이터를 남기기 위해
@@ -70,21 +77,21 @@ public class BoardController {
 		// RedirectAttributes를 활용하고 이 경우는
 		// Redirect이후에도 전달데이터가 남습니다.
 		log.info("register: " + board);
-		
+
 		service.register(board);
-		
+
 		rttr.addFlashAttribute("result", board.getBno());
 		rttr.addAttribute("searchType", cri.getSearchType());
 		rttr.addAttribute("keyword", cri.getKeyword());
 		return "redirect:/board/list";
 	}
-	
+
 	// get방식으로 해당 주소 접속시 글 작성창으로 안내
 	@GetMapping("/register")
 	public String register() {
 		return "/board/register";
 	}
-	
+
 	// 특정 번호의 글을 상세페이지에서 조회할 수 있도록
 	// get 기능을 구현해보겠습니다.
 	// 이 메서드는 파라미터로 글 번호 bno를 입력받고
@@ -96,68 +103,61 @@ public class BoardController {
 	// 지금 현재 메서드가 출력할 .jsp 파일을 생성하고,
 	// 그 파일 내부에 bno번 글을 표출해주세요.
 	@GetMapping("/get")
-	public void get(Long bno, Model model, 
-			SearchCriteria cri){
+	public void get(Long bno, Model model, SearchCriteria cri) {
 		model.addAttribute("cri", cri);
 		model.addAttribute("board", service.get(bno));
 	}
-	
+
 	// 수정 기능을 담당하는 modify메서드를 만들어보겠습니다.
 	// 수정 창으로 접근하는 .jsp는 get방식으로 접근하지만
 	// 실제 수정이 이루어지는 로직은 post방식으로 만듭니다.
 	// 수정창으로 진입하는 부분과, 수정 후 디테일 페이지로
 	// 넘어오는 로직을 추가로 작성해주세요.
 	@PostMapping("/modify")
-	public String modify(Model model, 
-			SearchCriteria cri, Long bno) {
-		
+	public String modify(Model model, SearchCriteria cri, Long bno) {
+
 		// 계획
 		// 1. 상세 글 정보를 저장합니다.
 		BoardVO board = service.get(bno);
 		// 2. 이 정보를 view 파일로 전송합니다.
 		model.addAttribute("board", board);
-		
+
 		model.addAttribute("cri", cri);
-		
+
 		return "/board/modify";
 	}
-	
-	// form에서 넘어온 파라미터를 받기 위해 
+
+	// form에서 넘어온 파라미터를 받기 위해
 	// 메서드 선언부에 BoardVO를 선언하고
-	// 리다이렉트시 글번호를 같이 넘기기 위해 
+	// 리다이렉트시 글번호를 같이 넘기기 위해
 	// RedirectAttributes를 선언합니다.
 	@PostMapping("/modifyrun")
-	public String modify(BoardVO board,
-					SearchCriteria cri,
-					RedirectAttributes rttr) {
+	public String modify(BoardVO board, SearchCriteria cri, RedirectAttributes rttr) {
 		// 넘겨받은 글 정보를 갱신 등록
 		service.modify(board);
-		
+
 		// 수정된 글 번호 정보를 저장
-		rttr.addFlashAttribute("bno",board.getBno());
+		rttr.addFlashAttribute("bno", board.getBno());
 		rttr.addAttribute("page", cri.getPage());
 		rttr.addAttribute("searchType", cri.getSearchType());
 		rttr.addAttribute("keyword", cri.getKeyword());
-		
+
 		// 디테일 페이지로 넘어가기 위해 redirect 주소 설정
 		return "redirect:/board/get?bno=" + board.getBno();
 	}
-	
+
 	// Remove 로직을 아래에 짜 주세요.
 	// 일반테스트시는 get방식을 처리할 수 있도록,
 	// 이후 테스트코드로 테스트할때는 post방식을 처리할수있도록 합니다.
 	@PostMapping("/remove")
-	public String remove(Long bno, 
-				RedirectAttributes rttr, 
-				SearchCriteria cri,
-				Model model) {
-		
+	public String remove(Long bno, RedirectAttributes rttr, SearchCriteria cri, Model model) {
+
 		service.remove(bno);
 		// 추후 삭제 완료시 XX번 글이 삭제되었습니다라는
 		// 팝업을 띄우기 위해 미리 세팅
 		rttr.addFlashAttribute("bno", bno);
-		//model.addAttribute("bno", bno);
-		
+		// model.addAttribute("bno", bno);
+
 		// Criteria의 page 정보를 url에 붙여서 보냅니다.
 		rttr.addAttribute("page", cri.getPage());
 		rttr.addAttribute("searchType", cri.getSearchType());
@@ -165,11 +165,62 @@ public class BoardController {
 		// 삭제된 글의 디테일페이지는 존재하지 않으므로 리스트로 이동
 		return "redirect:/board/list";
 	}
+
+	private boolean checkImageType(File file) {
+		try {
+			String contentType = Files.probeContentType(file.toPath());
+			return contentType.startsWith("image");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	private String getFolder() {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+		Date date = new Date();
+		String str = sdf.format(date);
+		return str.replace("-", File.separator);
+	}
+
 	
 
+	@PostMapping("/uploadAjaxAction")
+	public void uploadAjaxPost(MultipartFile[] uploadFile) {
+		log.info("ajax post update!");
+
+		String uploadFolder = "C:\\upload_data\\temp";
+
+		File uploadPath = new File(uploadFolder, getFolder());
+		log.info("upload path:" + uploadPath);
+		if (uploadPath.exists() == false) {
+			uploadPath.mkdirs();
+		}
+		for (MultipartFile multipartFile : uploadFile) {
+			log.info("=============");
+			log.info("Upload file name:" + multipartFile.getOriginalFilename());
+			log.info("Upload file size:" + multipartFile.getSize());
+
+			String uploadFileName = multipartFile.getOriginalFilename();
+			uploadFileName = uploadFileName.substring(uploadFileName.lastIndexOf("\\") + 1);
+			log.info("last file name : " + uploadFileName);
+
+			UUID uuid = UUID.randomUUID();
+			uploadFileName = uuid.toString() + "_" + uploadFileName;
+			try {
+				File saveFile = new File(uploadPath, uploadFileName);
+				multipartFile.transferTo(saveFile);
+				if (checkImageType(saveFile)) {
+					FileOutputStream thumbnail = new FileOutputStream(new File(uploadPath, "s_" + uploadFileName));
+
+					Thumbnailator.createThumbnail(multipartFile.getInputStream(), thumbnail, 100, 100);
+					thumbnail.close();
+				}
+			} catch (Exception e) {
+				log.error(e.getMessage());
+			}
+		}
+	}
+
 }
-
-
-
-
-

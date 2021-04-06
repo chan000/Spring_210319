@@ -71,6 +71,7 @@
 				</c:if>
 					<a href="/board/list?page=${cri.page }&searchType=${cri.searchType}&keyword=${cri.keyword}"
 					   class="btn btn-primary">목록</a>
+					   
 			</form>
 
 		</div><!-- row -->
@@ -323,7 +324,6 @@
 		});
 		
 		
-
 	});// $document
 	</script>
 </html>

@@ -1,5 +1,7 @@
 package org.ict.service;
 
+import java.sql.Date;
+
 import org.ict.domain.LoginDTO;
 import org.ict.domain.UserVO;
 import org.ict.mapper.UserMapper;
@@ -25,6 +27,16 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserVO getUserInfo(String uid) {
 		return mapper.getUserInfo(uid);
+	}
+
+	@Override
+	public void keepLogin(String uid, String sessionId, Date next) throws Exception {
+		mapper.keepLogin(uid, sessionId, next);
+	}
+
+	@Override
+	public UserVO checkLoginBefore(String value) {
+		return mapper.checkUserWithSessionKey(value);
 	}
 
 }
