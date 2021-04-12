@@ -5,6 +5,7 @@ import java.util.List;
 import org.ict.domain.BoardVO;
 import org.ict.domain.Criteria;
 import org.ict.domain.SearchCriteria;
+import org.ict.mapper.BoardAttachMapper;
 import org.ict.mapper.BoardMapper;
 import org.ict.mapper.ReplyMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +26,27 @@ public class BoardServiceImpl implements BoardService {
 	@Autowired
 	private ReplyMapper replyMapper; 
 	
+	@Autowired
+	private BoardAttachMapper attachMapper;
+	
 	// 메서드 실행용 테스트코드를 만들어주세요.
 	// src/test/java 하위에 org.ict.service 패키지를 만들고
 	// BoardServiceTests 클래스파일을 만들어주세요.
 	// 내부 멤버변수로 BoardService타입의 service를 선언하고
 	// @Autowired로 주입한 후, 하단에 register용 코드를 작성하세요.
+	@Transactional
 	@Override
 	public void register(BoardVO board) {
 		mapper.insert(board);
+		Long bno = mapper.getMaxBno();
+		if(board.getAttachList() == null || board.getAttachList().size() <= 0) {
+			return;
+		}
+		
+		board.getAttachList().forEach(attach -> {
+			attach.setBno(bno);
+			attachMapper.insert(attach);
+		});
 	}
 
 	// 하단의 모든 메서드를 다 구현해주세요.

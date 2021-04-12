@@ -37,6 +37,9 @@
 	<ul id="replies">
 	
 	</ul>
+	<ul class='pagination'>
+	
+	</ul>
 	<button id="addReplyList">리플 표출</button>
 	
 	<div id="modDiv" style="display:none;">
@@ -55,7 +58,7 @@
 	<!-- jquery CDN 입력 -->	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 	<script type="text/javascript">
-		var bno = 1;
+		var bno = 65534;
 		
 		function getAllList(){
 			$.getJSON("/replies/all/" + bno, function(data){
@@ -177,6 +180,61 @@
 				}
 			});
 		});
+		
+		function getPageList(page){
+			
+			$.getJSON("/replies/" + bno + "/" + page, function(data){
+				
+				console.log(data.list.length);
+				
+				var str = "";
+				
+				$(data.list).each(function(){
+					console.log(this)
+					str += "<li data-rno='" + this.rno + "' class='replyLi'>"
+						+ this.rno + ":" +this.replytext
+						+ "<button>MOD</button></li>";
+				});
+				
+				$("#replies").html(str);
+				printPaging(data.pageMaker);
+			});//getPageList
+			
+		}
+		
+		function printPaging(pageMaker){
+			
+			var str = "";
+			
+			if(pageMaker.prev){
+				str += "<li><a href='" + (pageMaker.startPage - 1) + "'> << </a></li>";
+			}
+			
+			for(var i = pageMaker.startPage, len = pageMaker.endPage; i <= len; i++){
+				var strClass = pageMaker.cri.page == i ? 'class=active':'';
+				str += "<li " + strClass + "><a href='" + i + "'>" + i + "</a></li>";
+			}
+			
+			if(pageMaker.next){
+				str += "<li class='page-item'><a class='page-link' href='" + (pageMaker.endPage + 1) + "'> >> </a></li>";
+			}
+			$('.pagination').html(str);
+			
+		}//pringPaging
+		
+		
+		$(".pagination").on("click", "li a", function(e){
+			e.preventDefault();
+			
+			var replyPage = $(this).attr("href");
+			
+			getPageList(replyPage);
+		});
+		
+		
+		
+		
+		getPageList(1);
 		
 		</script>
 	

@@ -2,6 +2,7 @@ package org.ict.service;
 
 import java.util.List;
 
+import org.ict.domain.Criteria;
 import org.ict.domain.ReplyVO;
 import org.ict.mapper.BoardMapper;
 import org.ict.mapper.ReplyMapper;
@@ -46,6 +47,16 @@ public class ReplyServiceImpl implements ReplyService {
 		Long bno = mapper.getBno(rno);
 		mapper.delete(rno);		
 		boardMapper.updateReplyCount(bno, -1);
+	}
+
+	@Override
+	public List<ReplyVO> getListPage(int bno, Criteria cri) {
+		return mapper.getListPage(bno, cri);
+	}
+
+	@Override
+	public int count(int bno) {
+		return mapper.count(bno);
 	}
 
 }

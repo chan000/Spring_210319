@@ -7,6 +7,8 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<h1>로그아웃 성공</h1>
+
+	<h1>로그아웃 했습니다.</h1>
+	
 </body>
 </html>

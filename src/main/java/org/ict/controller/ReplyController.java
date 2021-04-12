@@ -1,7 +1,11 @@
 package org.ict.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.ict.domain.Criteria;
+import org.ict.domain.PageMaker;
 import org.ict.domain.ReplyVO;
 import org.ict.service.ReplyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +21,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.extern.log4j.Log4j;
+
+
 @RestController
 @RequestMapping("/replies")
+@Log4j
 public class ReplyController {
 
 	@Autowired
@@ -118,7 +126,45 @@ public class ReplyController {
 		return entity;
 	}
 	
-	
+	@GetMapping(value= "/{bno}/{page}",
+				produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
+	public ResponseEntity<Map<String, Object>> getListPage(
+		@PathVariable("bno") int bno, @PathVariable("page") int page){
+		
+		ResponseEntity<Map<String, Object>> entity = null;
+		
+		Map<String, Object> result = new HashMap<>();
+		
+		Criteria cri = new Criteria();
+		cri.setPage(page);
+		log.info(cri);
+		
+		List<ReplyVO> list = service.getListPage(bno, cri);
+		
+		int count = service.count(bno);
+		
+		PageMaker pageMaker = new PageMaker();
+		
+		pageMaker.setCri(cri);
+		pageMaker.setTotalReply(count);
+		
+		// 1. result에 put 기능으로 위에 생성한 3객체를 넣어주세요.
+		result.put("list", list);
+		result.put("pageMaker", pageMaker);
+		result.put("cri", cri);
+		
+		// 2. try~catch구문을 이용해서 성공시 200코드로 리턴
+		// 실패시 400에러가 발생하도록 해 주세요.
+		try {
+			entity = new ResponseEntity<Map<String,Object>>(
+							result, HttpStatus.OK);
+		} catch (Exception e) {
+			entity = new ResponseEntity<Map<String, Object>>(
+							HttpStatus.BAD_REQUEST);
+		}
+		
+		return entity;
+	}
 	
 	
 	

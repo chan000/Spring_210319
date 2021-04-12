@@ -71,7 +71,6 @@
 				</c:if>
 					<a href="/board/list?page=${cri.page }&searchType=${cri.searchType}&keyword=${cri.keyword}"
 					   class="btn btn-primary">목록</a>
-					   
 			</form>
 
 		</div><!-- row -->
@@ -81,6 +80,12 @@
 				<!-- 댓글이 들어갈 위치 -->
 			</div>
 		</div><!-- row -->
+		<div class="row">
+			<ul class='pagination'>
+				<!-- 페이지네이션 -->
+			</ul>
+		</div><!-- row -->
+		
 		
 		<c:if test="${not empty login }">
 			<div class="row box-box-success">
@@ -189,15 +194,15 @@
 			
 			var bno = ${board.bno};
 			
-			function getAllList(){
-				$.getJSON("/replies/all/" + bno, function(data){
+			function getAllList(page){
+				$.getJSON("/replies/" + bno + "/" + page, function(data){
 					
-					console.log(data.length);
+					console.log(data.list.length);
 					var loginBool = "${login.uname}";
 					
 					var str = "";
 					
-					$(data).each(function() {
+					$(data.list).each(function() {
 						var timestamp = this.updatedate;
 						var date = new Date(timestamp);
 
@@ -220,9 +225,15 @@
 					});
 					
 					$("#replies").html(str);
+					printPaging(data.pageMaker);
 				});
 			}
-			getAllList();
+			getAllList(1);
+			
+			
+			
+			
+			
 			
 		
 		
@@ -286,7 +297,7 @@
 					if(result == 'SUCCESS') {
 						alert("삭제 되었습니다.");
 						$("#modDiv").hide("slow");
-						getAllList();
+						getAllList(1);
 					}
 				}
 			});
@@ -312,7 +323,7 @@
 					if(result == 'SUCCESS') {
 						alert("수정 되었습니다.");
 						$("#modDiv").hide("slow");
-						getAllList();
+						getAllList(1);
 					}
 				}
 			});
@@ -323,7 +334,35 @@
 			$("#modDiv").hide("slow");
 		});
 		
+		function printPaging(pageMaker){
+			
+			var str = "";
+			
+			if(pageMaker.prev){
+				str += "<li><a href='" + (pageMaker.startPage - 1) + "'> << </a></li>";
+			}
+			
+			for(var i = pageMaker.startPage, len = pageMaker.endPage; i <= len; i++){
+				var strClass = pageMaker.cri.page == i ? 'class=active':'';
+				str += "<li " + strClass + "><a href='" + i + "'>" + i + "</a></li>";
+			}
+			
+			if(pageMaker.next){
+				str += "<li class='page-item'><a class='page-link' href='" + (pageMaker.endPage + 1) + "'> >> </a></li>";
+			}
+			$('.pagination').html(str);
+			
+		}//printPaging
 		
+		
+		$(".pagination").on("click", "li a", function(e){
+			e.preventDefault();
+			
+			var replyPage = $(this).attr("href");
+			
+			getAllList(replyPage);
+		});
+
 	});// $document
 	</script>
 </html>

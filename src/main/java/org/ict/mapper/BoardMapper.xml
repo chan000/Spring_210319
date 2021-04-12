@@ -118,7 +118,9 @@
 		bno = #{bno}
 	</update>
 	
-	
+	<select id="getMaxBno" resultType="long">
+		SELECT MAX(bno) FROM ictboard
+	</select>
 
 
 </mapper>

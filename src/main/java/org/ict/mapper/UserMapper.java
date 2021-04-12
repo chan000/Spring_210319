@@ -12,13 +12,11 @@ public interface UserMapper {
 	
 	public void joinMember(UserVO vo);
 	
-	public void keepLogin(@Param("uid")String uid, 
-			@Param("sessionId")String sessionId, 
-			@Param("next")Date next);
-	
-	public UserVO checkUserWithSessionKey(String value);
-	
 	public UserVO getUserInfo(String uid);
 	
+	public void keepLogin(@Param("uid") String uid, 
+						@Param("sessionId") String sessionId, 
+						@Param("next") Date next);
+	
+	public UserVO checkUserWithSessionKey(String value);
 }
-

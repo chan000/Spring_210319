@@ -25,56 +25,58 @@ public class UserController {
 
 	@Autowired
 	private UserService service;
-
+	
 	@GetMapping("/login")
 	public void loginGet(@ModelAttribute("dto") LoginDTO dto) {
-
+		
 	}
-
+	
 	@PostMapping("/loginPost")
-	public void loginPost(LoginDTO dto, HttpSession session, Model model) throws Exception {
-
+	public void loginPost(LoginDTO dto, HttpSession session, Model model)
+		throws Exception{
+		
 		UserVO vo = service.login(dto);
-
-		if (vo == null) {
+		
+		if(vo == null) {
 			return;
 		}
 		model.addAttribute("userVO", vo);
-
-		if (dto.isUseCookie()) {
+		
+		if(dto.isUseCookie()) {
 			int amount = 60 * 60 * 24 * 7;
-
+			
 			Date sessionLimit = new Date(System.currentTimeMillis() + (1000 * amount));
-
+			
 			service.keepLogin(vo.getUid(), session.getId(), sessionLimit);
 		}
 	}
-
+	
 	@GetMapping("/joinmember")
 	public void joinMember() {
-
+		
 	}
-
 	@PostMapping("/joinmember")
 	public String joinMember(UserVO vo) {
 		service.joinMember(vo);
 		return "redirect:/board/list";
 	}
-
+	
 	@GetMapping("/logout")
-	public String logout(HttpServletRequest request, HttpServletResponse response, HttpSession session)
-			throws Exception {
-
+	public String logout(HttpServletRequest request,
+						HttpServletResponse response,
+						HttpSession session) throws Exception {
+		
 		Object obj = session.getAttribute("login");
-
-		if (obj != null) {
+		
+		if(obj != null) {
 			UserVO vo = (UserVO) obj;
-
+			
 			session.removeAttribute("login");
 			session.invalidate();
+			
 			Cookie loginCookie = WebUtils.getCookie(request, "loginCookie");
-
-			if (loginCookie != null) {
+			
+			if(loginCookie != null) {
 				loginCookie.setPath("/");
 				loginCookie.setMaxAge(0);
 				response.addCookie(loginCookie);
@@ -83,5 +85,8 @@ public class UserController {
 		}
 		return "user/logout";
 	}
-
+	
+	
+	
 }
+

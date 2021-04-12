@@ -30,13 +30,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void keepLogin(String uid, String sessionId, Date next) throws Exception {
+	public void keepLogin(String uid, String sessionId, Date next) throws Exception  {
 		mapper.keepLogin(uid, sessionId, next);
 	}
-
+	
 	@Override
 	public UserVO checkLoginBefore(String value) {
 		return mapper.checkUserWithSessionKey(value);
 	}
-
+	
 }

@@ -34,14 +34,13 @@ public class LoginInterceptor extends HandlerInterceptorAdapter{
 			log.info("new login success");
 			session.setAttribute(LOGIN, userVO);
 			
-			if (request.getParameter("useCookie") != null) {
-				log.info("remember me!");
+			if(request.getParameter("useCookie") != null) {
+				log.info("remember !");
 				Cookie loginCookie = new Cookie("loginCookie", session.getId());
 				loginCookie.setPath("/");
 				loginCookie.setMaxAge(60 * 60 * 24 * 7);
 				response.addCookie(loginCookie);
 			}
-			
 			
 			//response.sendRedirect("/");
 			// saveDest() 로 인해 세션에 저장된 이전 페이지 정보 가져오기
