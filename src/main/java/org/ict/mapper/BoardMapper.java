@@ -3,9 +3,7 @@ package org.ict.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 import org.ict.domain.BoardVO;
-import org.ict.domain.Criteria;
 import org.ict.domain.SearchCriteria;
 
 // 마이바티티스는 인터페이스 메서드를 정의한 다음

@@ -7,18 +7,41 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <style>
-	#modDiv {
-		width: 300px;
-		height: 100px;
-		background-color: yellow;
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		margin-top: -50px;
-		margin-left: -150px;
-		padding: 10px;
-		z-index: 1000;
-	}
+#modDiv {
+	width: 300px;
+	height: 100px;
+	background-color: yellow;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-top: -50px;
+	margin-left: -150px;
+	padding: 10px;
+	z-index: 1000;
+}
+
+#uploadResult {
+	width: 100%;
+	background-color: gray;
+}
+
+#uploadResult ul {
+	display: flex;
+	flex-flow: row;
+	justify-content: center;
+	align-items: center;
+}
+
+#uploadResult ul li {
+	list-style: none;
+	padding: 10px;
+	align-content: center;
+	text-align: center;
+}
+
+#uploadResult ul li img {
+	width: 100px;
+}
 </style>
 <meta charset="UTF-8">
 <title>Insert title here</title>
@@ -72,7 +95,14 @@
 					<a href="/board/list?page=${cri.page }&searchType=${cri.searchType}&keyword=${cri.keyword}"
 					   class="btn btn-primary">목록</a>
 			</form>
-
+			<div class="row">
+				<h3 class="text-primary">첨부파일</h3>
+				<div id="uploadResult">
+					<ul>
+					<!-- 첨부파일 들어갈 위치 -->
+					</ul>
+				</div>
+			</div>
 		</div><!-- row -->
 		<div class="row">
 			<h3 class="text-primary">댓글</h3>
@@ -363,6 +393,44 @@
 			getAllList(replyPage);
 		});
 
+		(function() {
+			$.getJSON("/board/getAttachList",{bno:bno},function(arr){
+				console.log(arr);	
+				var str="";
+				$(arr).each(function(i, attach) {
+					if (attach.fileType) {
+						var fileCallPath = encodeURIComponent(attach.uploadPath+"/s_"+
+								attach.uuid+"_" + attach.fileName);
+						str +="<li data-path='"+attach.uploadPath+"'data-uuid='"
+						+ attach.uuid+"'data-filename='" + attach.fileName
+						+ "'data-type='"+attach.fileType+"'><div>"
+						+ "<img src='/display?fileName="+fileCallPath+"'>"
+						+ "</div>"
+						+ "</li>";
+						
+					} else{
+						str +="<li data-path='"+attach.uploadPath+"'data-uuid='"
+						+ attach.uuid+"'data-filename='" + attach.fileName
+						+ "'data-type='"+attach.fileType+"'><div>"
+						+"<span>"+ attach.fileName+"</span><br>"
+						+ "<img src='/resources/attachicon.png' width='100px' height='100px'>"
+						+ "</div>"
+						+ "</li>";
+					}
+				});
+				$("#uploadResult ul").html(str);
+			}); // end getJSON
+		})(); // end anonymous
+		$("#uploadResult").on("click","li", function(e) {
+			var liObj=$(this);
+			
+			var path= encodeURIComponent(liObj.data("path")+"/"+ liObj.data("uuid")+"_"
+					+ liObj.data("filename"));
+			
+			self.location="/download?fileName="+ path;
+			
+		});
+		
 	});// $document
 	</script>
 </html>

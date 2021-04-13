@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.ict.domain.Criteria;
 import org.ict.domain.ReplyVO;
+import org.ict.mapper.BoardAttachMapper;
 import org.ict.mapper.BoardMapper;
 import org.ict.mapper.ReplyMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,5 +59,6 @@ public class ReplyServiceImpl implements ReplyService {
 	public int count(int bno) {
 		return mapper.count(bno);
 	}
+	
 
 }

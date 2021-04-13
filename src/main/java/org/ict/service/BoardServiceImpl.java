@@ -2,8 +2,8 @@ package org.ict.service;
 
 import java.util.List;
 
+import org.ict.domain.BoardAttachVO;
 import org.ict.domain.BoardVO;
-import org.ict.domain.Criteria;
 import org.ict.domain.SearchCriteria;
 import org.ict.mapper.BoardAttachMapper;
 import org.ict.mapper.BoardMapper;
@@ -22,13 +22,13 @@ public class BoardServiceImpl implements BoardService {
 	// mapper쪽 메서드를 호출하려면 mapper클래스를 먼저 선언합니다.
 	@Autowired
 	private BoardMapper mapper;
-	
+
 	@Autowired
-	private ReplyMapper replyMapper; 
-	
+	private ReplyMapper replyMapper;
+
 	@Autowired
 	private BoardAttachMapper attachMapper;
-	
+
 	// 메서드 실행용 테스트코드를 만들어주세요.
 	// src/test/java 하위에 org.ict.service 패키지를 만들고
 	// BoardServiceTests 클래스파일을 만들어주세요.
@@ -39,10 +39,10 @@ public class BoardServiceImpl implements BoardService {
 	public void register(BoardVO board) {
 		mapper.insert(board);
 		Long bno = mapper.getMaxBno();
-		if(board.getAttachList() == null || board.getAttachList().size() <= 0) {
+		if (board.getAttachList() == null || board.getAttachList().size() <= 0) {
 			return;
 		}
-		
+
 		board.getAttachList().forEach(attach -> {
 			attach.setBno(bno);
 			attachMapper.insert(attach);
@@ -56,7 +56,7 @@ public class BoardServiceImpl implements BoardService {
 	// 그렇지 않은 메서드들은 register처럼 그냥 호출해주세요.
 	@Override
 	public BoardVO get(Long bno) {
-		
+
 		return mapper.read(bno);
 	}
 
@@ -65,13 +65,26 @@ public class BoardServiceImpl implements BoardService {
 	// 참 거짓을 리턴하도록 합니다.
 	@Override
 	public boolean modify(BoardVO board) {
+		attachMapper.deleteAll(board.getBno());
+
+		boolean modifyResult = mapper.update(board) == 1;
+
+		if (modifyResult && board.getAttachList().size() > 0) {
+			board.getAttachList().forEach(attach -> {
+				attach.setBno(board.getBno());
+				attachMapper.insert(attach);
+			});
+		}
+
 		return mapper.update(board) == 1;
 	}
-	
+
 	@Transactional
 	@Override
 	public boolean remove(Long bno) {
 		replyMapper.deleteAll(bno);
+
+		attachMapper.deleteAll(bno);
 		return mapper.delete(bno) == 1;
 	}
 
@@ -88,6 +101,9 @@ public class BoardServiceImpl implements BoardService {
 		return mapper.countPageNum(cri);
 	}
 
-
+	@Override
+	public List<BoardAttachVO> getAttachList(Long bno) {
+		return attachMapper.findByBno(bno);
+	}
 
 }

@@ -7,16 +7,22 @@
 <mapper namespace="org.ict.mapper.BoardAttachMapper">
 
 	<insert id="insert">
-		INSERT INTO ictimage (uuid, uploadpath, filename, filetype, bno)
-			VALUES (#{uuid}, #{uploadPath}, #{fileName}, #{fileType}, #{bno})
+		INSERT INTO ictimage (uuid, uploadpath, filename,
+		filetype, bno)
+		VALUES (#{uuid}, #{uploadPath}, #{fileName}, #{fileType}, #{bno})
 	</insert>
-	
+
 	<delete id="delete">
 		DELETE FROM ictimage WHERE uuid = #{uuid}
 	</delete>
 
 	<select id="findByBno" resultType="org.ict.domain.BoardAttachVO">
-		SELECT * FROM ictimage WHERE bno = #{bno}
+		SELECT * FROM ictimage WHERE
+		bno = #{bno}
 	</select>
 
+
+	<delete id="deleteAll">
+		DELETE FROM ictimage WHERE bno = #{bno}
+	</delete>
 </mapper>
