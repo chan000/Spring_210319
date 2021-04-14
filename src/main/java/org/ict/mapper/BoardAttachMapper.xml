@@ -9,7 +9,8 @@
 	<insert id="insert">
 		INSERT INTO ictimage (uuid, uploadpath, filename,
 		filetype, bno)
-		VALUES (#{uuid}, #{uploadPath}, #{fileName}, #{fileType}, #{bno})
+		VALUES (#{uuid}, #{uploadPath}, #{fileName},
+		#{fileType}, #{bno})
 	</insert>
 
 	<delete id="delete">
@@ -25,4 +26,10 @@
 	<delete id="deleteAll">
 		DELETE FROM ictimage WHERE bno = #{bno}
 	</delete>
+
+	<select id="getOldFiles"
+		resultType="org.ict.domain.BoardAttachVO">
+		SELECT * FROM ictimage WHERE uploadpath = DATE_FORMAT(now()
+		- interval 1 day, '%Y\%m\%d');
+	</select>
 </mapper>
